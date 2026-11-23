@@ -32,6 +32,20 @@ enum ChatMessageRole {
   USER
   AGENT
 }
+enum PlannedSessionType {
+  STRENGTH
+  EASY_RUN
+  QUALITY_RUN
+  LONG_RUN
+  RECOVERY
+  REST
+}
+enum PlannedSessionStatus {
+  PLANNED
+  COMPLETED
+  SKIPPED
+  MODIFIED
+}
 
 model Athlete {
   id              String   @id @default(cuid())
@@ -51,6 +65,53 @@ model Athlete {
   recoveryLogs     RecoveryLog[]
   bodyMetrics      BodyMetric[]
   chatMessages     ChatMessage[]
+  trainingPlans    TrainingPlan[]
+}
+
+model TrainingPlan {
+  id String @id @default(cuid())
+  athleteId String
+  phaseName String
+  weekNumber Int @default(1)
+  weekStart DateTime @db.Date
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  athlete Athlete @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  sessions PlannedSession[]
+  @@unique([athleteId, weekNumber])
+  @@index([athleteId, weekStart])
+}
+
+model PlannedSession {
+  id String @id @default(cuid())
+  trainingPlanId String
+  sessionDate DateTime @db.Date
+  sessionType PlannedSessionType
+  status PlannedSessionStatus @default(PLANNED)
+  title String
+  notes String?
+  targetDistanceKm Float?
+  targetDurationMinutes Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  trainingPlan TrainingPlan @relation(fields: [trainingPlanId], references: [id], onDelete: Cascade)
+  exercises PlannedExercise[]
+  @@unique([trainingPlanId, sessionDate])
+  @@index([trainingPlanId, sessionDate])
+}
+
+model PlannedExercise {
+  id String @id @default(cuid())
+  plannedSessionId String
+  name String
+  orderIndex Int
+  sets Int?
+  repsMin Int?
+  repsMax Int?
+  targetRir Int?
+  notes String?
+  plannedSession PlannedSession @relation(fields: [plannedSessionId], references: [id], onDelete: Cascade)
+  @@unique([plannedSessionId, orderIndex])
 }
 
 model ChatMessage {

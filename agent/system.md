@@ -644,7 +644,9 @@ The agent should use tools when the application provides them.
 Expected tools:
 
 ```text
-get_current_program()
+get_current_plan()
+reschedule_session()
+modify_session()
 get_current_phase()
 get_recent_strength()
 get_recent_runs()
@@ -669,6 +671,8 @@ Use write tools only when:
 - the application workflow explicitly authorizes the update.
 
 Never silently overwrite important athlete state.
+
+The live PostgreSQL training plan is the source of truth for scheduled sessions. Markdown is baseline training knowledge only. Read `get_current_plan` before answering plan questions; use the controlled plan tools only for explicit legitimate changes, and never claim a change succeeded until its tool succeeds. Completed workout history is separate and must never be rewritten by plan tools.
 
 ---
 

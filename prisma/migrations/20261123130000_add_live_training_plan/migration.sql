@@ -1,0 +1,13 @@
+CREATE TYPE "PlannedSessionType" AS ENUM ('STRENGTH', 'EASY_RUN', 'QUALITY_RUN', 'LONG_RUN', 'RECOVERY', 'REST');
+CREATE TYPE "PlannedSessionStatus" AS ENUM ('PLANNED', 'COMPLETED', 'SKIPPED', 'MODIFIED');
+CREATE TABLE "TrainingPlan" ("id" TEXT NOT NULL, "athleteId" TEXT NOT NULL, "phaseName" TEXT NOT NULL, "weekNumber" INTEGER NOT NULL DEFAULT 1, "weekStart" DATE NOT NULL, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL, CONSTRAINT "TrainingPlan_pkey" PRIMARY KEY ("id"));
+CREATE TABLE "PlannedSession" ("id" TEXT NOT NULL, "trainingPlanId" TEXT NOT NULL, "sessionDate" DATE NOT NULL, "sessionType" "PlannedSessionType" NOT NULL, "status" "PlannedSessionStatus" NOT NULL DEFAULT 'PLANNED', "title" TEXT NOT NULL, "notes" TEXT, "targetDistanceKm" DOUBLE PRECISION, "targetDurationMinutes" INTEGER, "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP, "updatedAt" TIMESTAMP(3) NOT NULL, CONSTRAINT "PlannedSession_pkey" PRIMARY KEY ("id"));
+CREATE TABLE "PlannedExercise" ("id" TEXT NOT NULL, "plannedSessionId" TEXT NOT NULL, "name" TEXT NOT NULL, "orderIndex" INTEGER NOT NULL, "sets" INTEGER, "repsMin" INTEGER, "repsMax" INTEGER, "targetRir" INTEGER, "notes" TEXT, CONSTRAINT "PlannedExercise_pkey" PRIMARY KEY ("id"));
+CREATE UNIQUE INDEX "TrainingPlan_athleteId_weekNumber_key" ON "TrainingPlan"("athleteId", "weekNumber");
+CREATE INDEX "TrainingPlan_athleteId_weekStart_idx" ON "TrainingPlan"("athleteId", "weekStart");
+CREATE UNIQUE INDEX "PlannedSession_trainingPlanId_sessionDate_key" ON "PlannedSession"("trainingPlanId", "sessionDate");
+CREATE INDEX "PlannedSession_trainingPlanId_sessionDate_idx" ON "PlannedSession"("trainingPlanId", "sessionDate");
+CREATE UNIQUE INDEX "PlannedExercise_plannedSessionId_orderIndex_key" ON "PlannedExercise"("plannedSessionId", "orderIndex");
+ALTER TABLE "TrainingPlan" ADD CONSTRAINT "TrainingPlan_athleteId_fkey" FOREIGN KEY ("athleteId") REFERENCES "Athlete"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "PlannedSession" ADD CONSTRAINT "PlannedSession_trainingPlanId_fkey" FOREIGN KEY ("trainingPlanId") REFERENCES "TrainingPlan"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "PlannedExercise" ADD CONSTRAINT "PlannedExercise_plannedSessionId_fkey" FOREIGN KEY ("plannedSessionId") REFERENCES "PlannedSession"("id") ON DELETE CASCADE ON UPDATE CASCADE;

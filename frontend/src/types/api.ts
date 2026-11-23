@@ -133,10 +133,8 @@ export interface PhaseData {
   endDate: string | null;
 }
 
-export interface ProgramData {
-  phase: PhaseData;
-  program: { source: string; content: string; note: string };
-}
+export interface ProgramData { id: string; phaseName: string; weekNumber: number; weekStart: string; sessions: PlannedSession[]; }
+export interface PlannedSession { id: string; sessionDate: string; sessionType: string; status: string; title: string; notes: string | null; targetDistanceKm: number | null; targetDurationMinutes: number | null; exercises: ProgramExercise[]; }
 
 export interface StrengthPayload {
   sessionDate?: string;

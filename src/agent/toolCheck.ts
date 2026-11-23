@@ -72,7 +72,7 @@ async function main(): Promise<void> {
   await prisma.athlete.deleteMany({ where: { id: config.athleteId } });
 
   console.log('1. Read tools');
-  for (const name of ['get_current_phase', 'get_current_program']) {
+  for (const name of ['get_current_phase', 'get_current_plan']) {
     const result = await executeTool(name, {});
     check(`read ${name}`, isSuccess(result), errorCode(result) ?? 'ok');
   }

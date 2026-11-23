@@ -6,6 +6,7 @@ import { Chat } from './pages/Chat';
 import { Dashboard } from './pages/Dashboard';
 import { Log } from './pages/Log';
 import { Progress } from './pages/Progress';
+import { Plan } from './pages/Plan';
 import { api, describeError } from './services/api';
 
 function Login({ onLogin }: { onLogin: () => void }) {
@@ -23,6 +24,7 @@ export function App() {
   const [tab, setTab] = useState<Tab>('dashboard');
   const online = useOnline();
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
+  const [planRefresh, setPlanRefresh] = useState(0);
   useEffect(() => { void api.session().then(() => setAuthenticated(true)).catch(() => setAuthenticated(false)); }, []);
   if (authenticated === null) return <main className="main"><p className="loading">Checking session…</p></main>;
   if (!authenticated) return <Login onLogin={() => setAuthenticated(true)} />;
@@ -35,7 +37,8 @@ export function App() {
         {!online ? <OfflineBanner /> : null}
 
         {tab === 'dashboard' ? <Dashboard /> : null}
-        {tab === 'chat' ? <Chat /> : null}
+        {tab === 'plan' ? <Plan refreshKey={planRefresh} /> : null}
+        {tab === 'chat' ? <Chat onPlanChanged={() => setPlanRefresh((value) => value + 1)} /> : null}
         {tab === 'log' ? <Log /> : null}
         {tab === 'progress' ? <Progress /> : null}
       </main>

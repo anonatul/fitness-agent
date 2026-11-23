@@ -1,4 +1,4 @@
-export type Tab = 'dashboard' | 'chat' | 'log' | 'progress';
+export type Tab = 'dashboard' | 'plan' | 'chat' | 'log' | 'progress';
 
 interface NavigationProps {
   active: Tab;
@@ -7,6 +7,7 @@ interface NavigationProps {
 
 const ITEMS: ReadonlyArray<{ id: Tab; label: string }> = [
   { id: 'dashboard', label: 'Today' },
+  { id: 'plan', label: 'Plan' },
   { id: 'chat', label: 'Chat' },
   { id: 'log', label: 'Log' },
   { id: 'progress', label: 'Progress' },

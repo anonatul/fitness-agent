@@ -132,7 +132,7 @@ function RecentSummary({ data }: { data: DashboardData }) {
 export function Dashboard() {
   const today = useAsync(() => api.dashboard(), [], describeError);
   const program = useAsync(() => api.program(), [], describeError);
-  const phase = program.data?.phase;
+  const plan = program.data;
 
   return (
     <div className="page">
@@ -147,18 +147,16 @@ export function Dashboard() {
 
       <div className="grid two">
         <Card title="Current phase">
-          {phase ? (
+          {plan ? (
             <>
-              <p className="lead">{phase.phaseName ?? 'No data logged'}</p>
-              <p className="muted small">{phase.objective ?? 'No data logged'}</p>
+              <p className="lead">{plan.phaseName}</p>
+              <p className="muted small">Week {plan.weekNumber} live plan</p>
             </>
           ) : null}
         </Card>
         <Card title="Primary goal">
-          <p className="lead">{phase?.priority.primary ?? 'No data logged'}</p>
-          {phase?.priority.secondary ? (
-            <p className="muted small">Secondary: {phase.priority.secondary}</p>
-          ) : null}
+          <p className="lead">Strength and hypertrophy</p>
+          <p className="muted small">{plan?.sessions.length ?? 0} scheduled sessions</p>
         </Card>
       </div>
 

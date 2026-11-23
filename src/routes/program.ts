@@ -1,26 +1,17 @@
 import { Router } from 'express';
-import { executeTool } from '../agent/toolRegistry';
-import type { ToolResult } from '../agent/toolTypes';
+import { getCurrentPlan, sessionForAthlete } from '../db/plan';
 import { AppError } from '../errors';
 
 export const programRouter = Router();
 
-function dataOf(result: ToolResult): unknown {
-  if (!result.success) {
-    throw new AppError(502, 'Program data is currently unavailable.');
-  }
-  return result.data;
-}
-
 programRouter.get('/', async (_req, res, next) => {
   try {
-    const [phase, program] = await Promise.all([
-      executeTool('get_current_phase', {}),
-      executeTool('get_current_program', {}),
-    ]);
-
-    res.status(200).json({ phase: dataOf(phase), program: dataOf(program) });
+    const plan = await getCurrentPlan();
+    if (!plan) throw new AppError(502, 'Program data is currently unavailable.');
+    res.status(200).json(plan);
   } catch (error) {
     next(error);
   }
 });
+
+programRouter.get('/sessions/:sessionId', async (req, res, next) => { try { const session = await sessionForAthlete(req.params.sessionId); if (!session) throw new AppError(404, 'Planned session not found.'); res.status(200).json(session); } catch (error) { next(error); } });

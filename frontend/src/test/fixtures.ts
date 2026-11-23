@@ -72,22 +72,4 @@ export const recentData: RecentData = {
   bodyMetrics: [],
 };
 
-export const programData = {
-  phase: {
-    source: 'program/current_phase.md',
-    phaseName: 'Foundation Strength & Hypertrophy + Aerobic Base',
-    objective: 'Build a durable base.',
-    priority: {
-      primary: 'Strength and hypertrophy',
-      secondary: 'Body composition',
-      tertiary: 'Running development',
-    },
-    startDate: null,
-    endDate: null,
-  },
-  program: {
-    source: 'program/current_program.md',
-    content: 'Current program',
-    note: 'Plan, not completed work.',
-  },
-};
+export const programData = { id: 'plan-1', phaseName: 'Foundation Strength & Hypertrophy + Aerobic Base', weekNumber: 1, weekStart: '2026-11-23T00:00:00.000Z', sessions: [] };

@@ -10,7 +10,7 @@ const SUGGESTIONS = [
   'My legs are sore. Should I run?',
 ];
 
-export function Chat() {
+export function Chat({ onPlanChanged = () => undefined }: { onPlanChanged?: () => void }) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
@@ -59,6 +59,7 @@ export function Chat() {
 
     try {
       await api.chat(message);
+      onPlanChanged();
       const history = await api.chatHistory();
       setMessages(history.messages);
     } catch (caught) {

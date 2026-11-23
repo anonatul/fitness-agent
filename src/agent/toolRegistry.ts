@@ -1,16 +1,18 @@
 import { toolError, type RegisteredTool, type ToolResult, type ToolSummary } from './toolTypes';
 import { getBodyMetricsTool } from './tools/getBodyMetrics';
 import { getCurrentPhaseTool } from './tools/getCurrentPhase';
-import { getCurrentProgramTool } from './tools/getCurrentProgram';
 import { getRecentRunsTool } from './tools/getRecentRuns';
 import { getRecentStrengthTool } from './tools/getRecentStrength';
 import { getRecoveryTool } from './tools/getRecovery';
 import { logRunTool } from './tools/logRun';
 import { logStrengthSessionTool } from './tools/logStrengthSession';
+import { getCurrentPlanTool, modifySessionTool, rescheduleSessionTool } from './tools/planTools';
 
 const TOOLS: readonly RegisteredTool[] = [
   getCurrentPhaseTool,
-  getCurrentProgramTool,
+  getCurrentPlanTool,
+  rescheduleSessionTool,
+  modifySessionTool,
   getRecentStrengthTool,
   getRecentRunsTool,
   getRecoveryTool,

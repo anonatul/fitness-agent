@@ -55,6 +55,11 @@ export interface ContextBuildResult {
   database: DatabaseContext;
 }
 
+export interface ChatHistoryItem {
+  role: 'user' | 'agent';
+  text: string;
+}
+
 function renderFiles(
   files: readonly string[],
   loaded: Map<string, string | null>,
@@ -99,7 +104,10 @@ function sectionSizes(sections: readonly Section[]): Record<string, number> {
  *   instruction hierarchy → agent instructions → user context →
  *   program context → selected knowledge → database state → user message
  */
-export async function buildChatContext(message: string): Promise<ContextBuildResult> {
+export async function buildChatContext(
+  message: string,
+  chatHistory: readonly ChatHistoryItem[] = [],
+): Promise<ContextBuildResult> {
   const userMessage = message.trim();
 
   if (userMessage.length === 0) {
@@ -119,6 +127,13 @@ export async function buildChatContext(message: string): Promise<ContextBuildRes
       ? '(No specific knowledge module matched this message. Rely on the core rules above.)'
       : renderFiles(selection.files, knowledgeFiles);
 
+  const recentConversation =
+    chatHistory.length === 0
+      ? '(No previous conversation in this chat.)'
+      : chatHistory
+          .map((item) => `${item.role === 'user' ? 'Athlete' : 'Agent'}: ${item.text}`)
+          .join('\n');
+
   const sections: Section[] = [
     { name: 'instruction_hierarchy', body: INSTRUCTION_HIERARCHY },
     { name: 'agent_instructions', body: renderFiles(CORE_AGENT_FILES, coreFiles) },
@@ -126,6 +141,7 @@ export async function buildChatContext(message: string): Promise<ContextBuildRes
     { name: 'program_context', body: renderFiles(CORE_PROGRAM_FILES, coreFiles) },
     { name: 'knowledge', body: knowledgeBody },
     { name: 'database_state', body: database.text },
+    { name: 'recent_conversation', body: recentConversation },
     { name: 'user_message', body: userMessage },
   ];
 

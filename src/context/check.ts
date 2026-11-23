@@ -81,6 +81,31 @@ async function main(): Promise<void> {
     );
   }
 
+  const historyContext = await buildChatContext('What did we decide?', [
+    { role: 'user', text: 'I only have 20 minutes today.' },
+    { role: 'agent', text: 'Use the shortened strength session.' },
+  ]);
+  check(
+    'recent conversation is included in model context',
+    historyContext.input.includes('I only have 20 minutes today.') &&
+      historyContext.input.includes('Use the shortened strength session.') &&
+    (historyContext.sectionSizes.recent_conversation ?? 0) > 0,
+  );
+  check(
+    'athlete profile and program context are included',
+    historyContext.input.includes('### user/profile.md') &&
+      historyContext.input.includes('### program/current_phase.md') &&
+      historyContext.input.includes('### program/current_program.md') &&
+      historyContext.input.includes('### program/progression_rules.md') &&
+      historyContext.input.includes('### program/decision_rules.md'),
+  );
+  check(
+    'missing database data is explicitly disclosed',
+    historyContext.database.available &&
+      historyContext.database.text.includes('None logged') ||
+      historyContext.database.text.includes('No training history'),
+  );
+
   console.log('\n4. Database state');
   const database = await getDatabaseContext();
   check('database context available', database.available, `counts=${JSON.stringify(database.counts)}`);

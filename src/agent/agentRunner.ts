@@ -2,7 +2,7 @@ import type {
   ResponseFunctionToolCall,
   ResponseInputItem,
 } from 'openai/resources/responses/responses.js';
-import { buildChatContext } from '../context/contextBuilder';
+import { buildChatContext, type ChatHistoryItem } from '../context/contextBuilder';
 import { config } from '../config/env';
 import { AppError } from '../errors';
 import { callModel } from '../services/agentRouter';
@@ -33,8 +33,11 @@ function isFunctionCall(item: unknown): item is ResponseFunctionToolCall {
  * Run a bounded model ↔ tool loop. All tool execution is dispatched through
  * the backend registry; the model only ever sees names, schemas and results.
  */
-export async function runAgent(userMessage: string): Promise<string> {
-  const { input } = await buildChatContext(userMessage);
+export async function runAgent(
+  userMessage: string,
+  chatHistory: readonly ChatHistoryItem[] = [],
+): Promise<string> {
+  const { input } = await buildChatContext(userMessage, chatHistory);
   const decision = await runDecisionEngine(userMessage);
   const tools = listToolDefinitions();
 

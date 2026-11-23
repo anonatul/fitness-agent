@@ -28,6 +28,11 @@ enum RunType {
   OTHER
 }
 
+enum ChatMessageRole {
+  USER
+  AGENT
+}
+
 model Athlete {
   id              String   @id @default(cuid())
   name            String?
@@ -45,6 +50,19 @@ model Athlete {
   trainingSessions TrainingSession[]
   recoveryLogs     RecoveryLog[]
   bodyMetrics      BodyMetric[]
+  chatMessages     ChatMessage[]
+}
+
+model ChatMessage {
+  id        String          @id @default(cuid())
+  athleteId String
+  role      ChatMessageRole
+  text      String
+  createdAt DateTime        @default(now())
+
+  athlete Athlete @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+
+  @@index([athleteId, createdAt])
 }
 
 model Goal {

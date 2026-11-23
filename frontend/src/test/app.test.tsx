@@ -11,6 +11,7 @@ vi.mock('../services/api', () => ({
     program: vi.fn(),
     recent: vi.fn(),
     chat: vi.fn(),
+    chatHistory: vi.fn(),
   },
   describeError: (error: unknown) =>
     error instanceof Error ? error.message : 'Unable to connect to the training agent. Try again.',
@@ -22,6 +23,7 @@ describe('App shell', () => {
     vi.mocked(api.dashboard).mockResolvedValue(dashboardData);
     vi.mocked(api.program).mockResolvedValue(programData);
     vi.mocked(api.recent).mockResolvedValue(recentData);
+    vi.mocked(api.chatHistory).mockResolvedValue({ messages: [] });
   });
 
   it('offers four primary destinations and switches screens', async () => {

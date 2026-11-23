@@ -2,6 +2,7 @@ import type {
   ApiErrorBody,
   BodyMetric,
   ChatResponse,
+  ChatHistoryResponse,
   DashboardData,
   ProgramData,
   RecentData,
@@ -79,6 +80,10 @@ function jsonBody(value: unknown): string {
 }
 
 export const api = {
+  chatHistory(): Promise<ChatHistoryResponse> {
+    return request<ChatHistoryResponse>('/api/chat');
+  },
+
   chat(message: string): Promise<ChatResponse> {
     return request<ChatResponse>(
       '/api/chat',

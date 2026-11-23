@@ -1,13 +1,8 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { ErrorNotice } from '../components/ErrorNotice';
 import { Loading } from '../components/Loading';
 import { api, describeError } from '../services/api';
-
-interface Message {
-  id: number;
-  role: 'user' | 'agent';
-  text: string;
-}
+import type { ChatMessage } from '../types/api';
 
 const SUGGESTIONS = [
   'What should I do today?',
@@ -16,10 +11,36 @@ const SUGGESTIONS = [
 ];
 
 export function Chat() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    api.chatHistory()
+      .then((history) => {
+        if (active) {
+          setMessages(history.messages);
+        }
+      })
+      .catch((caught) => {
+        if (active) {
+          setError(describeError(caught));
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   async function send(text: string): Promise<void> {
     const message = text.trim();
@@ -28,19 +49,25 @@ export function Chat() {
       return;
     }
 
-    const id = Date.now();
-    setMessages((previous) => [...previous, { id, role: 'user', text: message }]);
+    setMessages((previous) => [
+      ...previous,
+      { id: `pending-${Date.now()}`, role: 'user', text: message, createdAt: new Date().toISOString() },
+    ]);
     setInput('');
     setSending(true);
     setError(null);
 
     try {
-      const response = await api.chat(message);
-      setMessages((previous) => [
-        ...previous,
-        { id: id + 1, role: 'agent', text: response.response },
-      ]);
+      await api.chat(message);
+      const history = await api.chatHistory();
+      setMessages(history.messages);
     } catch (caught) {
+      try {
+        const history = await api.chatHistory();
+        setMessages(history.messages);
+      } catch {
+        // Keep the original send error visible if history cannot be reloaded.
+      }
       setError(describeError(caught));
     } finally {
       setSending(false);
@@ -74,6 +101,7 @@ export function Chat() {
           </article>
         ))}
 
+        {loading ? <Loading label="Loading conversation..." /> : null}
         {sending ? <Loading label="Thinking..." /> : null}
         {error ? <ErrorNotice message={error} /> : null}
       </div>

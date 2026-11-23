@@ -1,5 +1,18 @@
 export interface ChatResponse {
   response: string;
+  userMessage?: ChatMessage;
+  agentMessage?: ChatMessage;
+}
+
+export interface ChatMessage {
+  id: string;
+  role: 'user' | 'agent';
+  text: string;
+  createdAt: string;
+}
+
+export interface ChatHistoryResponse {
+  messages: ChatMessage[];
 }
 
 export interface ApiErrorBody {

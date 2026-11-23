@@ -11,7 +11,11 @@ function getClient(): OpenAI {
     throw new AppError(500, 'Agent service is not configured.');
   }
 
-  client ??= new OpenAI({ apiKey, baseURL });
+  client ??= new OpenAI({
+    apiKey,
+    baseURL,
+    defaultHeaders: { 'User-Agent': config.agentRouter.userAgent },
+  });
 
   return client;
 }

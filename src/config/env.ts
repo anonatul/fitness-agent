@@ -21,9 +21,28 @@ function readPort(): number {
   return port;
 }
 
+function readPositiveInt(name: string, fallback: number): number {
+  const raw = process.env[name];
+
+  if (!raw) {
+    return fallback;
+  }
+
+  const value = Number(raw);
+
+  if (!Number.isInteger(value) || value <= 0) {
+    throw new Error(`${name} must be a positive integer.`);
+  }
+
+  return value;
+}
+
 export const config = {
   port: readPort(),
   databaseUrl: process.env.DATABASE_URL?.trim() ?? '',
+  athleteId: process.env.ATHLETE_ID?.trim() ?? '',
+  historyDays: readPositiveInt('AGENT_HISTORY_DAYS', 30),
+  contextMaxChars: readPositiveInt('CONTEXT_MAX_CHARS', 200_000),
   agentRouter: {
     apiKey: process.env.AGENTROUTER_API_KEY?.trim() ?? '',
     baseURL: process.env.AGENTROUTER_BASE_URL?.trim() || DEFAULT_BASE_URL,

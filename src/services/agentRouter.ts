@@ -20,13 +20,13 @@ function getClient(): OpenAI {
   return client;
 }
 
-export async function generateReply(message: string): Promise<string> {
+export async function generateReply(input: string): Promise<string> {
   const openai = getClient();
 
   try {
     const response = await openai.responses.create({
       model: config.agentRouter.model,
-      input: message,
+      input,
     });
 
     const text = response.output_text?.trim();

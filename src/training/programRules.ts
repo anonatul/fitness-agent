@@ -23,9 +23,12 @@ function parseSingleNumber(value: string): number | null {
   return match?.[0] ? Number(match[0]) : null;
 }
 
-/** Reads the current program Markdown; never duplicates it into constants. */
-export async function loadProgramSections(): Promise<ProgramSection[]> {
-  const markdown = await loadMarkdown(PROGRAM_SOURCE);
+/**
+ * Reads the current program Markdown; never duplicates it into constants.
+ * Evaluation fixtures may pass Markdown explicitly to stay deterministic.
+ */
+export async function loadProgramSections(markdownOverride?: string): Promise<ProgramSection[]> {
+  const markdown = markdownOverride ?? (await loadMarkdown(PROGRAM_SOURCE));
 
   if (markdown === null) {
     return [];
@@ -94,8 +97,9 @@ export function canonicalExerciseName(name: string): string {
 
 export async function findProgramExercise(
   name: string,
+  markdownOverride?: string,
 ): Promise<{ section: ProgramSection; exercise: ProgramExerciseView } | null> {
-  const sections = await loadProgramSections();
+  const sections = await loadProgramSections(markdownOverride);
   const key = canonicalExerciseName(name);
 
   for (const section of sections) {
@@ -112,8 +116,9 @@ export async function findProgramExercise(
 /** Pick the next strength block based on the last logged block, not a calendar. */
 export async function selectNextStrengthSection(
   lastExerciseNames: readonly string[],
+  markdownOverride?: string,
 ): Promise<ProgramSection | null> {
-  const sections = await loadProgramSections();
+  const sections = await loadProgramSections(markdownOverride);
 
   if (sections.length === 0) {
     return null;

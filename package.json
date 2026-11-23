@@ -13,8 +13,12 @@
     "db:migrate": "prisma migrate dev",
     "db:check": "tsx src/db/check-cli.ts",
     "context:check": "tsx src/context/check.ts",
-    "tools:check": "tsx src/agent/toolCheck.ts",
+    "tools:check": "ATHLETE_ID=tool-check-athlete tsx src/agent/toolCheck.ts",
     "training:check": "tsx src/training/trainingCheck.ts",
+    "test:eval": "node --env-file=.env --import tsx tests/evaluation/evaluationRunner.ts",
+    "test:llm": "node --env-file=.env --import tsx tests/evaluation/llmEvalRunner.ts",
+    "test:loop": "node --env-file=.env --import tsx tests/integration/toolLoopLimit.ts",
+    "test:all": "npm run test:eval && npm run context:check && npm run tools:check && npm run training:check && npm run build",
     "postinstall": "prisma generate"
   },
   "dependencies": {

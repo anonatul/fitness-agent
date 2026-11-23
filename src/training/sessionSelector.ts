@@ -37,9 +37,10 @@ function lowerBodyFatigue(input: DecisionInput): boolean {
 async function selectStrengthSession(
   input: DecisionInput,
   progression: ProgressionAssessment,
+  programMarkdown?: string,
 ): Promise<SelectionResult> {
   const modifications: string[] = [];
-  const section = await selectNextStrengthSection(recentExerciseNames(input));
+  const section = await selectNextStrengthSection(recentExerciseNames(input), programMarkdown);
 
   if (input.missedWorkout) {
     modifications.push('Missed training is not doubled. Keep today to one appropriate session.');
@@ -146,6 +147,7 @@ export async function selectSession(
   safety: SafetyAssessment,
   readiness: ReadinessAssessment,
   progression: ProgressionAssessment,
+  programMarkdown?: string,
 ): Promise<SelectionResult> {
   if (input.intent === 'RECOVERY' || readiness.category === 'POOR' || safety.level === 'MODIFY') {
     return {
@@ -163,5 +165,5 @@ export async function selectSession(
     return selectRunSession(input);
   }
 
-  return selectStrengthSession(input, progression);
+  return selectStrengthSession(input, progression, programMarkdown);
 }

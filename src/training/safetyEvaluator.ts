@@ -20,6 +20,7 @@ const RED_FLAG_PATTERNS: ReadonlyArray<{ pattern: RegExp; flag: string }> = [
   { pattern: /\b(joint\s+pain|swelling|numbness|tingling|instability|localized\s+(bone\s+)?tenderness)\b/i, flag: 'JOINT_OR_NEURAL_SIGN' },
   { pattern: /\b(knee|shin|ankle|achilles|hip)\b.{0,25}\bpain\b/i, flag: 'LOCALIZED_PAIN' },
   { pattern: /\bpain\b.{0,25}\b(knee|shin|ankle|achilles|hip)\b/i, flag: 'LOCALIZED_PAIN' },
+  { pattern: /\b(knee|shin|ankle|achilles|hip|shoulder|back)\b.{0,25}\b(hurts?|aching|sore)\b/i, flag: 'LOCALIZED_PAIN' },
 ];
 
 const NORMAL_DISCOMFORT = /\b(normal\s+(muscle\s+)?(soreness|fatigue|discomfort)|muscle\s+soreness|mild\s+soreness|dom\s+soreness)\b/i;

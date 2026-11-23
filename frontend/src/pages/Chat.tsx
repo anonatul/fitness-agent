@@ -55,7 +55,6 @@ export function Chat() {
   return (
     <div className="page chat-page">
       <header className="page-head">
-        <p className="eyebrow">Training assistant</p>
         <h1>Chat</h1>
         <p className="muted">Decisions come from your logged training, recovery, and current program.</p>
       </header>

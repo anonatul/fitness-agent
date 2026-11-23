@@ -137,7 +137,6 @@ export function Dashboard() {
   return (
     <div className="page">
       <header className="page-head">
-        <p className="eyebrow">Your training</p>
         <h1>Today</h1>
       </header>
 

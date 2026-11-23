@@ -122,7 +122,6 @@ export function Progress() {
   return (
     <div className="page">
       <header className="page-head">
-        <p className="eyebrow">History</p>
         <h1>Progress</h1>
         <p className="muted">Actual logged sessions only. Missing values are shown as not logged.</p>
       </header>

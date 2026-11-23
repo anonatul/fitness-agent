@@ -21,6 +21,7 @@ node_modules/
 dist/
 *.tsbuildinfo
 npm-debug.log*
+.hallmark/
 
 # Environment files. Keep only the example.
 .env

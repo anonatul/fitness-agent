@@ -10,7 +10,6 @@ export function Log() {
   return (
     <div className="page">
       <header className="page-head">
-        <p className="eyebrow">Actual work only</p>
         <h1>Log</h1>
         <p className="muted">Only completed training is saved. Planned sessions are never logged automatically.</p>
       </header>

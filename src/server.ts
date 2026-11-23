@@ -1,5 +1,7 @@
 import { app } from './app';
 import { config } from './config/env';
+import { checkDatabaseConnection } from './db/check';
+import { disconnectPrisma } from './db/prisma';
 
 const server = app.listen(config.port, () => {
   console.log(`Server listening on http://localhost:${config.port}`);
@@ -9,13 +11,21 @@ const server = app.listen(config.port, () => {
       'AGENTROUTER_API_KEY is not set. /api/chat will return 500 until it is configured.',
     );
   }
+
+  void checkDatabaseConnection().then((ok) => {
+    console.log(
+      ok
+        ? 'Database connection OK.'
+        : 'Database connection unavailable. /health remains available.',
+    );
+  });
 });
 
 function shutdown(signal: string): void {
   console.log(`${signal} received. Shutting down.`);
 
   server.close(() => {
-    process.exit(0);
+    void disconnectPrisma().finally(() => process.exit(0));
   });
 }
 

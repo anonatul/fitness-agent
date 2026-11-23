@@ -23,6 +23,7 @@ function readPort(): number {
 
 export const config = {
   port: readPort(),
+  databaseUrl: process.env.DATABASE_URL?.trim() ?? '',
   agentRouter: {
     apiKey: process.env.AGENTROUTER_API_KEY?.trim() ?? '',
     baseURL: process.env.AGENTROUTER_BASE_URL?.trim() || DEFAULT_BASE_URL,

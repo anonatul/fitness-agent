@@ -6,6 +6,7 @@ import { buildChatContext } from '../context/contextBuilder';
 import { config } from '../config/env';
 import { AppError } from '../errors';
 import { callModel } from '../services/agentRouter';
+import { formatDecisionForPrompt, runDecisionEngine } from './decisionEngine';
 import { executeTool, listToolDefinitions } from './toolRegistry';
 
 function isFunctionCall(item: unknown): item is ResponseFunctionToolCall {
@@ -34,8 +35,14 @@ function isFunctionCall(item: unknown): item is ResponseFunctionToolCall {
  */
 export async function runAgent(userMessage: string): Promise<string> {
   const { input } = await buildChatContext(userMessage);
+  const decision = await runDecisionEngine(userMessage);
   const tools = listToolDefinitions();
-  const conversation: ResponseInputItem[] = [{ role: 'user', content: input }];
+
+  console.info(`[agent] decision=${decision.decision} intent=${decision.intent}`);
+
+  const conversation: ResponseInputItem[] = [
+    { role: 'user', content: `${input}\n\n${formatDecisionForPrompt(decision)}` },
+  ];
 
   for (let round = 0; round < config.maxToolRounds; round += 1) {
     const response = await callModel({ input: conversation, tools });

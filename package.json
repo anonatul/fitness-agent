@@ -14,6 +14,7 @@
     "db:check": "tsx src/db/check-cli.ts",
     "context:check": "tsx src/context/check.ts",
     "tools:check": "tsx src/agent/toolCheck.ts",
+    "training:check": "tsx src/training/trainingCheck.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {

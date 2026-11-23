@@ -43,6 +43,7 @@ export const config = {
   athleteId: process.env.ATHLETE_ID?.trim() ?? '',
   historyDays: readPositiveInt('AGENT_HISTORY_DAYS', 30),
   contextMaxChars: readPositiveInt('CONTEXT_MAX_CHARS', 200_000),
+  maxToolRounds: readPositiveInt('AGENT_MAX_TOOL_ROUNDS', 5),
   agentRouter: {
     apiKey: process.env.AGENTROUTER_API_KEY?.trim() ?? '',
     baseURL: process.env.AGENTROUTER_BASE_URL?.trim() || DEFAULT_BASE_URL,

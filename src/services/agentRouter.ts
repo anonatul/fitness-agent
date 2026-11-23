@@ -1,4 +1,9 @@
 import OpenAI from 'openai';
+import type {
+  FunctionTool,
+  Response,
+  ResponseInputItem,
+} from 'openai/resources/responses/responses.js';
 import { config } from '../config/env';
 import { AppError } from '../errors';
 
@@ -20,22 +25,38 @@ function getClient(): OpenAI {
   return client;
 }
 
-export async function generateReply(input: string): Promise<string> {
+export interface ModelToolDefinition {
+  name: string;
+  description: string;
+  parameters: Record<string, unknown>;
+}
+
+export interface ModelRequest {
+  input: readonly ResponseInputItem[];
+  tools: readonly ModelToolDefinition[];
+}
+
+/**
+ * Low-level Responses API call. The model receives only tool names,
+ * descriptions and JSON schemas — never Prisma or application internals.
+ */
+export async function callModel(request: ModelRequest): Promise<Response> {
   const openai = getClient();
 
   try {
-    const response = await openai.responses.create({
+    return await openai.responses.create({
       model: config.agentRouter.model,
-      input,
+      input: [...request.input],
+      tools: request.tools.map(
+        (tool): FunctionTool => ({
+          type: 'function',
+          name: tool.name,
+          description: tool.description,
+          parameters: tool.parameters,
+          strict: false,
+        }),
+      ),
     });
-
-    const text = response.output_text?.trim();
-
-    if (!text) {
-      throw new AppError(502, 'The agent returned an empty response.');
-    }
-
-    return text;
   } catch (error) {
     if (error instanceof AppError) {
       throw error;

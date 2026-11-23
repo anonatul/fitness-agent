@@ -1,0 +1,18 @@
+# Personal user data stays local.
+# Use the short templates in user/examples/ instead.
+/user/profile.md
+/user/goals.md
+/user/equipment.md
+/user/preferences.md
+
+# Personal training logs.
+/logs/**/*.md
+
+# Editor, OS, and Python noise.
+.DS_Store
+*.swp
+*.swo
+__pycache__/
+*.py[cod]
+.env
+.venv/

@@ -10,7 +10,10 @@ export function getPrisma(): PrismaClient {
   }
 
   client ??= new PrismaClient({
-    adapter: new PrismaPg({ connectionString: config.databaseUrl }),
+    adapter: new PrismaPg({
+      connectionString: config.databaseUrl,
+      connectionTimeoutMillis: 5_000,
+    }),
   });
 
   return client;

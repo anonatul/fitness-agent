@@ -12,6 +12,7 @@
     "prisma:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:check": "tsx src/db/check-cli.ts",
+    "context:check": "tsx src/context/check.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {

@@ -14,5 +14,14 @@
 *.swo
 __pycache__/
 *.py[cod]
-.env
 .venv/
+
+# Node.js
+node_modules/
+dist/
+*.tsbuildinfo
+npm-debug.log*
+
+# Environment files. Keep only the example.
+.env
+!.env.example

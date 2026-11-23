@@ -67,7 +67,7 @@ export async function buildTrainingDecision(input: DecisionInput): Promise<Train
   const safety = evaluateSafety(input.message, input.state.recoveryLogs);
   const readiness = evaluateReadiness(input.state, safety);
 
-  const program = await loadProgramSections();
+  const program = await loadProgramSections(input.programMarkdown);
   const firstProgramExercise = program[0]?.exercises[0]?.name ?? null;
   const focus = focusExerciseName(input, firstProgramExercise);
 
@@ -76,20 +76,27 @@ export async function buildTrainingDecision(input: DecisionInput): Promise<Train
     input.state,
     readiness.category,
     safety.flags,
+    input.programMarkdown,
   );
 
-  const selection = await selectSession(input, safety, readiness, progression);
+  const selection = await selectSession(input, safety, readiness, progression, input.programMarkdown);
 
   let kind = decideKind(input, safety, readiness, progression);
 
   if (selection.suggestModify && kind === 'MAINTAIN') {
     kind = 'MODIFY';
   }
+
   const session = selection.session;
 
   if (session && input.availableMinutes !== null) {
     session.durationMinutes = input.availableMinutes;
   }
+
+  const modifications =
+    kind === 'CLARIFY'
+      ? [...selection.modifications, 'Log only the actual values reported, using the appropriate logging tool.']
+      : [...selection.modifications];
 
   const dataNotes = [...readiness.missing];
 
@@ -116,8 +123,8 @@ export async function buildTrainingDecision(input: DecisionInput): Promise<Train
     decision: kind,
     confidence: confidenceFor(input),
     reason: reasonParts.filter((part) => part.length > 0).join(' '),
-    session,
-    modifications: selection.modifications,
+    session: kind === 'CLARIFY' ? undefined : session,
+    modifications,
     progression: {
       apply: kind !== 'REST' && progression.action === 'PROGRESS',
       reason: progression.reason,

@@ -54,8 +54,9 @@ export async function evaluateStrengthProgression(
   state: TrainingState,
   readiness: Readiness,
   safetyFlags: readonly string[],
+  programMarkdown?: string,
 ): Promise<ProgressionAssessment> {
-  const found = await findProgramExercise(exerciseName);
+  const found = await findProgramExercise(exerciseName, programMarkdown);
   const target = found?.exercise
     ? { min: found.exercise.repsMin, max: found.exercise.repsMax }
     : undefined;

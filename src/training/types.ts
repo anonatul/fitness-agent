@@ -106,4 +106,6 @@ export interface DecisionInput {
   state: TrainingState;
   availableMinutes: number | null;
   missedWorkout: boolean;
+  /** Optional synthetic program Markdown used by evaluation fixtures. */
+  programMarkdown?: string;
 }

@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: fitness-agent-api
+    runtime: node
+    buildCommand: npm ci && npm run build
+    preDeployCommand: npm run db:deploy
+    startCommand: npm start
+    healthCheckPath: /health
+    autoDeploy: false

@@ -16,8 +16,9 @@ const BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/$/, '');
 
 const NETWORK_MESSAGE = 'Unable to connect to the training agent. Try again.';
 const AGENT_MESSAGE = "The training agent couldn't complete that request. Try again.";
+let csrfToken = '';
 
-export type ApiErrorKind = 'network' | 'validation' | 'agent';
+export type ApiErrorKind = 'network' | 'validation' | 'authentication' | 'agent';
 
 export class ApiFailure extends Error {
   constructor(
@@ -46,14 +47,29 @@ async function request<T>(path: string, init: RequestInit = {}, timeoutMs = 20_0
     const response = await fetch(`${BASE_URL}${path}`, {
       ...init,
       signal: controller.signal,
-      headers: { 'Content-Type': 'application/json', ...init.headers },
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json', ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {}), ...init.headers },
     });
+
+    if (response.status === 204) return undefined as T;
 
     const payload: unknown = await response.json().catch(() => null);
 
     if (!response.ok) {
       if (response.status === 400) {
         throw new ApiFailure('validation', messageFrom(payload) ?? 'Please check the form and try again.');
+      }
+
+      if (response.status === 401) {
+        throw new ApiFailure('authentication', messageFrom(payload) ?? 'Incorrect password.');
+      }
+
+      if (response.status === 403) {
+        throw new ApiFailure('authentication', 'This browser origin is not allowed by the API.');
+      }
+
+      if (response.status === 503) {
+        throw new ApiFailure('authentication', 'Authentication is not configured on the API.');
       }
 
       throw new ApiFailure('agent', AGENT_MESSAGE);
@@ -80,6 +96,20 @@ function jsonBody(value: unknown): string {
 }
 
 export const api = {
+  async session(): Promise<void> {
+    const result = await request<{ csrfToken: string }>('/api/auth/session');
+    csrfToken = result.csrfToken;
+  },
+
+  async login(password: string): Promise<void> {
+    const result = await request<{ csrfToken: string }>('/api/auth/login', { method: 'POST', body: jsonBody({ password }) });
+    csrfToken = result.csrfToken;
+  },
+
+  async logout(): Promise<void> {
+    await request<void>('/api/auth/logout', { method: 'POST' });
+    csrfToken = '';
+  },
   chatHistory(): Promise<ChatHistoryResponse> {
     return request<ChatHistoryResponse>('/api/chat');
   },

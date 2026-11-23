@@ -18,6 +18,11 @@ export const errorHandler: ErrorRequestHandler = (error, _req, res, _next) => {
     return;
   }
 
+  if (err instanceof Error && ('type' in err && err.type === 'entity.too.large' || /request entity too large/i.test(err.message))) {
+    res.status(413).json({ error: { message: 'Request body is too large.' } });
+    return;
+  }
+
   console.error(
     'Unexpected server error:',
     err instanceof Error ? err.message : 'Unknown error',

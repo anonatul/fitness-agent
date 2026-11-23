@@ -12,6 +12,8 @@ vi.mock('../services/api', () => ({
     recent: vi.fn(),
     chat: vi.fn(),
     chatHistory: vi.fn(),
+    session: vi.fn(),
+    login: vi.fn(),
   },
   describeError: (error: unknown) =>
     error instanceof Error ? error.message : 'Unable to connect to the training agent. Try again.',
@@ -24,6 +26,7 @@ describe('App shell', () => {
     vi.mocked(api.program).mockResolvedValue(programData);
     vi.mocked(api.recent).mockResolvedValue(recentData);
     vi.mocked(api.chatHistory).mockResolvedValue({ messages: [] });
+    vi.mocked(api.session).mockResolvedValue();
   });
 
   it('offers four primary destinations and switches screens', async () => {
@@ -31,7 +34,7 @@ describe('App shell', () => {
     render(<App />);
 
     for (const name of ['Today', 'Chat', 'Log', 'Progress']) {
-      expect(screen.getByRole('button', { name })).toBeInTheDocument();
+      expect(await screen.findByRole('button', { name })).toBeInTheDocument();
     }
 
     await user.click(screen.getByRole('button', { name: 'Chat' }));
@@ -39,12 +42,12 @@ describe('App shell', () => {
     expect(screen.getByLabelText('Message')).toBeInTheDocument();
   });
 
-  it('shows a clear offline message', () => {
+  it('shows a clear offline message', async () => {
     const online = vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
     render(<App />);
 
     expect(
-      screen.getByText("You're offline. Reconnect to use the training agent."),
+      await screen.findByText("You're offline. Reconnect to use the training agent."),
     ).toBeInTheDocument();
 
     online.mockRestore();

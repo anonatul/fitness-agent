@@ -170,6 +170,7 @@ async function main(): Promise<void> {
       timeout: 30_000,
       env: {
         ...process.env,
+        ATHLETE_ID: 'db-failure-probe-athlete',
         DATABASE_URL: 'postgresql://invalid:invalid@127.0.0.1:1/invalid?sslmode=no-verify',
       },
     },

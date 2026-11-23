@@ -12,6 +12,10 @@ const server = app.listen(config.port, () => {
     );
   }
 
+  if (!config.auth.password || !config.auth.sessionSecret || !config.athleteId) {
+    console.warn('Authentication is incomplete. Set AUTH_PASSWORD, AUTH_SESSION_SECRET, and ATHLETE_ID.');
+  }
+
   void checkDatabaseConnection().then((ok) => {
     console.log(
       ok

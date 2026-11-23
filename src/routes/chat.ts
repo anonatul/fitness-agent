@@ -30,7 +30,7 @@ chatRouter.post('/', async (req, res, next) => {
     const body: unknown = req.body;
     const message = isRecord(body) ? body.message : undefined;
 
-    if (typeof message !== 'string' || message.trim().length === 0) {
+    if (typeof message !== 'string' || message.trim().length === 0 || message.length > 4000) {
       throw new AppError(400, 'message is required and must be a non-empty string.');
     }
 

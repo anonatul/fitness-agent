@@ -4,21 +4,12 @@ import { getPrisma } from './prisma';
 /** Read-only resolution used by context and read tools. */
 export async function getReadAthleteId(): Promise<string | null> {
   const prisma = getPrisma();
-
-  if (config.athleteId) {
-    const found = await prisma.athlete.findUnique({
-      where: { id: config.athleteId },
-      select: { id: true },
-    });
-    return found?.id ?? null;
-  }
-
-  const first = await prisma.athlete.findFirst({
-    orderBy: { createdAt: 'asc' },
+  if (!config.athleteId) return null;
+  const found = await prisma.athlete.findUnique({
+    where: { id: config.athleteId },
     select: { id: true },
   });
-
-  return first?.id ?? null;
+  return found?.id ?? null;
 }
 
 /**
@@ -46,18 +37,5 @@ export async function getWriteAthleteId(): Promise<string | null> {
     return created.id;
   }
 
-  const first = await prisma.athlete.findFirst({
-    orderBy: { createdAt: 'asc' },
-    select: { id: true },
-  });
-
-  if (first) {
-    return first.id;
-  }
-
-  const created = await prisma.athlete.create({
-    data: { name: 'Athlete' },
-    select: { id: true },
-  });
-  return created.id;
+  return null;
 }

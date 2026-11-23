@@ -1,7 +1,6 @@
 import { Router } from 'express';
-import { buildChatContext } from '../context/contextBuilder';
+import { runAgent } from '../agent/agentRunner';
 import { AppError } from '../errors';
-import { generateReply } from '../services/agentRouter';
 
 export const chatRouter = Router();
 
@@ -18,8 +17,7 @@ chatRouter.post('/', async (req, res, next) => {
       throw new AppError(400, 'message is required and must be a non-empty string.');
     }
 
-    const { input } = await buildChatContext(message.trim());
-    const response = await generateReply(input);
+    const response = await runAgent(message.trim());
 
     res.status(200).json({ response });
   } catch (error) {

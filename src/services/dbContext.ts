@@ -1,4 +1,5 @@
 import { config } from '../config/env';
+import { getReadAthleteId } from '../db/athlete';
 import { getPrisma } from '../db/prisma';
 
 export interface DatabaseCounts {
@@ -41,20 +42,6 @@ function truncate(value: string, max: number): string {
   return value.length > max ? `${value.slice(0, max)}…` : value;
 }
 
-async function resolveAthleteId(): Promise<string | null> {
-  if (config.athleteId) {
-    return config.athleteId;
-  }
-
-  // Single-athlete development stage: fall back to the first stored athlete.
-  const athlete = await getPrisma().athlete.findFirst({
-    orderBy: { createdAt: 'asc' },
-    select: { id: true },
-  });
-
-  return athlete?.id ?? null;
-}
-
 /**
  * Retrieve a small, recent slice of the athlete's dynamic state.
  * Degrades to a readable note when the database is unconfigured or unavailable.
@@ -71,7 +58,7 @@ export async function getDatabaseContext(): Promise<DatabaseContext> {
   try {
     const prisma = getPrisma();
     const since = new Date(Date.now() - config.historyDays * 86_400_000);
-    const athleteId = await resolveAthleteId();
+    const athleteId = await getReadAthleteId();
 
     if (!athleteId) {
       return {
